@@ -53,12 +53,15 @@ this destination (see below).
   weekly sync via a scheduled GitHub Actions workflow that commits+pushes updated
   data to trigger Cloudflare Pages' auto-deploy; stale/bad data keeps serving
   last-known-good silently but fails the workflow loudly (self-alerting via email).
+- [Decide ranking and zero/multiple-match messaging rules](tickets/006-edge-case-ux-rules.md):
+  rank by total walking distance (both ends), show all matches uncapped; zero-match
+  shows a message plus a suggestion to try elsewhere/another tool; no special
+  far-stop warning beyond the distance figure already shown.
 
 ## Not yet specified
 
-- Ranking/tie-breaking rules when multiple direct routes match, and messaging for the
-  zero-match case, aren't sharp yet — depends on seeing the prototype reaction (see
-  ticket 006, blocked on the ticket 004 prototype).
+Only ticket 007 (JSON index schema) remains open — no further unticketed fog at this
+point; the map is close to fully specified.
 
 ## Out of scope
 
