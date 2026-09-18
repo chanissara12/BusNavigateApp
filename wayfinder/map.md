@@ -57,11 +57,16 @@ this destination (see below).
   rank by total walking distance (both ends), show all matches uncapped; zero-match
   shows a message plus a suggestion to try elsewhere/another tool; no special
   far-stop warning beyond the distance figure already shown.
+- [Design the stop-pair-to-routes JSON index schema and build step](tickets/007-json-index-schema.md):
+  per-stop index (not per-pair) intersected client-side at query time; candidate
+  stops are every stop within 500m of each end (not just the single nearest);
+  stop names/coords live in a separate `stops.json`; build script at
+  `scripts/build-gtfs-index.mjs`, validated by a ±20% stop/route-count sanity check.
 
 ## Not yet specified
 
-Only ticket 007 (JSON index schema) remains open — no further unticketed fog at this
-point; the map is close to fully specified.
+None — every branch surfaced during charting has either resolved into a decision
+above or been ruled out of scope below. All seven tickets are closed.
 
 ## Out of scope
 
