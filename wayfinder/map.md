@@ -49,6 +49,10 @@ this destination (see below).
   winning layout combines Variant B's map section (origin/destination + route line)
   with Variant A's vertically-scannable list-style result cards — rejected the
   carousel. See [prototype/004-core-screen.winner.html](../prototype/004-core-screen.winner.html).
+- [Decide GTFS sync/update mechanism and cadence](tickets/005-gtfs-sync-mechanism.md):
+  weekly sync via a scheduled GitHub Actions workflow that commits+pushes updated
+  data to trigger Cloudflare Pages' auto-deploy; stale/bad data keeps serving
+  last-known-good silently but fails the workflow loudly (self-alerting via email).
 
 ## Not yet specified
 
