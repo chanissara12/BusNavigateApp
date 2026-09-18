@@ -42,18 +42,15 @@ this destination (see below).
   fidelity) and OSM/Nominatim (free, but bans autocomplete UX, 1 req/sec cap, needs
   caching) are the front-runners since Google requires a billing card even for its
   free tier.
+- [Decide recommended tech stack and hosting for the spec](tickets/003-tech-stack-hosting.md):
+  Longdo Map API + React/Vite PWA (via `vite-plugin-pwa`) + GTFS precomputed into a
+  static client-side JSON index (no backend) + Cloudflare Pages hosting.
 
 ## Not yet specified
 
-- Once the GTFS data-shape investigation lands, the exact query/data-pipeline design
-  for "find direct routes covering stop A → stop B in the correct direction" isn't
-  sharp yet — how directionality and route variants are represented in this specific
-  feed is unknown until then.
-- Once the map/geocoding choice lands, the exact UI copy and interaction flow for the
-  destination-search + pin-drop screen isn't sharp yet.
 - Ranking/tie-breaking rules when multiple direct routes match, and messaging for the
-  zero-match case, aren't sharp yet — depends on seeing the prototype reaction.
-- Deployment/hosting specifics (once a stack is chosen) aren't sharp yet.
+  zero-match case, aren't sharp yet — depends on seeing the prototype reaction (see
+  ticket 006, blocked on the ticket 004 prototype).
 
 ## Out of scope
 
