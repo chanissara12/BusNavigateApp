@@ -1,0 +1,157 @@
+<!--
+  PROTOTYPE — winning design for Wayfinder ticket 004, combining the
+  "map-first" top section from Variant B with the "list-first" result
+  cards from Variant A. This is the validated decision, kept as a visual
+  reference for the real implementation (not itself production code).
+  The full 3-variant exploration lives on the `prototype/004-core-screen`
+  branch, not here.
+-->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[PROTOTYPE] หารถเมล์ - winning combo (map + list)</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --bg: #ffffff;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --warn-bg: #fef3c7;
+    --card-bg: #f9fafb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
+    background: #f3f4f6;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+  }
+  #app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--bg);
+  }
+  header.topbar {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 5;
+  }
+  .brand { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .search-row { display: flex; gap: 8px; }
+  .search-input {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--line);
+    border-radius: 10px; font-size: 15px;
+  }
+  .pin-btn {
+    padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--card-bg); font-size: 13px; white-space: nowrap;
+  }
+  .origin-row {
+    margin-top: 8px; font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .origin-row button { border: none; background: none; color: var(--accent); font-size: 13px; text-decoration: underline; }
+  main { padding: 12px 16px; }
+
+  .fake-map {
+    height: 190px;
+    border-radius: 14px;
+    background:
+      repeating-linear-gradient(0deg, #dbeafe, #dbeafe 18px, #eff6ff 18px, #eff6ff 36px),
+      repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(15,118,110,0.08) 38px, rgba(15,118,110,0.08) 40px);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+  }
+  .pin { position: absolute; font-size: 22px; transform: translate(-50%, -100%); }
+  .pin.origin { left: 30%; top: 65%; }
+  .pin.dest { left: 72%; top: 28%; }
+  .route-line {
+    position: absolute; left: 30%; top: 28%; width: 42%; height: 37%;
+    border: 2px dashed var(--accent); border-radius: 40% 5% 40% 5%;
+    border-left: none; border-bottom: none;
+  }
+  .map-caption {
+    position: absolute; bottom: 8px; left: 8px; right: 8px;
+    font-size: 11px; color: var(--muted); background: rgba(255,255,255,0.85);
+    padding: 3px 6px; border-radius: 6px;
+  }
+
+  .section-label { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .route-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; border: 1px solid var(--line); border-radius: 12px;
+    margin-bottom: 10px; background: var(--card-bg);
+  }
+  .bus-badge {
+    flex: 0 0 auto; width: 52px; height: 52px; border-radius: 10px;
+    background: var(--accent); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 17px;
+  }
+  .route-detail { flex: 1; min-width: 0; }
+  .route-stops { font-size: 14px; font-weight: 600; }
+  .route-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .walk-pill { font-size: 12px; background: var(--warn-bg); padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">🚌 หารถเมล์ [PROTOTYPE — winning combo]</div>
+    <div class="search-row">
+      <input class="search-input" placeholder="พิมพ์จุดหมาย เช่น สยามพารากอน" value="สยามพารากอน">
+      <button class="pin-btn">📍 ปักหมุด</button>
+    </div>
+    <div class="origin-row">
+      <span>ต้นทาง: ป้ายหน้าคอนโด เอบีซี (GPS)</span>
+      <button>แก้ไข</button>
+    </div>
+  </header>
+  <main>
+    <div class="fake-map">
+      <div class="route-line"></div>
+      <div class="pin origin">🧍</div>
+      <div class="pin dest">🎯</div>
+      <div class="map-caption">แผนที่จำลอง (ของจริงใช้ Longdo Map)</div>
+    </div>
+    <div class="section-label">สายที่ไปถึงตรง (3 สาย)</div>
+    <div class="route-card">
+      <div class="bus-badge">25</div>
+      <div class="route-detail">
+        <div class="route-stops">ป้ายหน้าคอนโด ABC → ป้ายสยามพารากอน</div>
+        <div class="route-sub">เดินไปป้าย 3 นาที</div>
+      </div>
+      <div class="walk-pill">🚶 3 นาที</div>
+    </div>
+    <div class="route-card">
+      <div class="bus-badge">8</div>
+      <div class="route-detail">
+        <div class="route-stops">ป้ายปากซอย 4 → ป้ายสยามสแควร์</div>
+        <div class="route-sub">เดินไปป้าย 7 นาที</div>
+      </div>
+      <div class="walk-pill">🚶 7 นาที</div>
+    </div>
+    <div class="route-card">
+      <div class="bus-badge">48</div>
+      <div class="route-detail">
+        <div class="route-stops">ป้ายหน้าคอนโด ABC → ป้ายสยามพารากอน (ฝั่งตรงข้าม)</div>
+        <div class="route-sub">เดินไปป้าย 4 นาที</div>
+      </div>
+      <div class="walk-pill">🚶 4 นาที</div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

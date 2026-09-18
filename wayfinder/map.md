@@ -45,6 +45,10 @@ this destination (see below).
 - [Decide recommended tech stack and hosting for the spec](tickets/003-tech-stack-hosting.md):
   Longdo Map API + React/Vite PWA (via `vite-plugin-pwa`) + GTFS precomputed into a
   static client-side JSON index (no backend) + Cloudflare Pages hosting.
+- [Prototype the destination-search → matching-routes screen](tickets/004-core-ui-prototype.md):
+  winning layout combines Variant B's map section (origin/destination + route line)
+  with Variant A's vertically-scannable list-style result cards — rejected the
+  carousel. See [prototype/004-core-screen.winner.html](../prototype/004-core-screen.winner.html).
 
 ## Not yet specified
 
