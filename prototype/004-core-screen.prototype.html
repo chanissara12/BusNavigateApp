@@ -1,0 +1,360 @@
+<!--
+  PROTOTYPE — throwaway, answers Wayfinder ticket 004:
+  "does the destination-search -> matching-routes screen read as 'ดูง่าย'
+  (easy to see at a glance) while standing at a bus stop?"
+
+  Three structurally different variants, switch with the floating bar
+  (or ← → keys). Mock data only — no real Longdo Map / GTFS wiring.
+  Just double-click this file to open it in a browser.
+-->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[PROTOTYPE] หารถเมล์ - core screen</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --bg: #ffffff;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --warn-bg: #fef3c7;
+    --card-bg: #f9fafb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
+    background: #f3f4f6;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+  }
+  #app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--bg);
+    position: relative;
+    padding-bottom: 90px;
+  }
+  header.topbar {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 5;
+  }
+  .brand { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .search-row {
+    display: flex;
+    gap: 8px;
+  }
+  .search-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 15px;
+  }
+  .pin-btn {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--card-bg);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .origin-row {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .origin-row button {
+    border: none;
+    background: none;
+    color: var(--accent);
+    font-size: 13px;
+    text-decoration: underline;
+  }
+  main { padding: 12px 16px; }
+
+  /* ---------- Variant A: list-first ---------- */
+  .route-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background: var(--card-bg);
+  }
+  .bus-badge {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .route-detail { flex: 1; min-width: 0; }
+  .route-stops { font-size: 14px; font-weight: 600; }
+  .route-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .walk-pill {
+    font-size: 12px;
+    background: var(--warn-bg);
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Variant B: map-first ---------- */
+  .fake-map {
+    height: 220px;
+    border-radius: 14px;
+    background:
+      repeating-linear-gradient(0deg, #dbeafe, #dbeafe 18px, #eff6ff 18px, #eff6ff 36px),
+      repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(15,118,110,0.08) 38px, rgba(15,118,110,0.08) 40px);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+  }
+  .pin { position: absolute; font-size: 22px; transform: translate(-50%, -100%); }
+  .pin.origin { left: 30%; top: 65%; }
+  .pin.dest { left: 72%; top: 28%; }
+  .route-line {
+    position: absolute; left: 30%; top: 28%; width: 42%; height: 37%;
+    border: 2px dashed var(--accent); border-radius: 40% 5% 40% 5%;
+    border-left: none; border-bottom: none;
+  }
+  .map-caption {
+    position: absolute; bottom: 8px; left: 8px; right: 8px;
+    font-size: 11px; color: var(--muted); background: rgba(255,255,255,0.85);
+    padding: 3px 6px; border-radius: 6px;
+  }
+  .carousel { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; }
+  .carousel-card {
+    scroll-snap-align: start;
+    flex: 0 0 78%;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--card-bg);
+  }
+  .carousel-card .bus-badge { width: 44px; height: 44px; font-size: 15px; margin-bottom: 8px; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+  .dot.active { background: var(--accent); }
+
+  /* ---------- Variant C: big-badge focus ---------- */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .big-badge {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 34px;
+    cursor: pointer;
+    border: none;
+  }
+  .big-badge .walk { font-size: 12px; font-weight: 500; opacity: 0.9; margin-top: 4px; }
+  .expand-detail {
+    grid-column: 1 / -1;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--card-bg);
+    font-size: 13.5px;
+  }
+  .hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  .variant-title { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+
+  /* ---------- switcher ---------- */
+  #switcher {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827;
+    color: white;
+    border-radius: 999px;
+    padding: 8px 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    z-index: 20;
+    font-size: 13px;
+  }
+  #switcher button {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #switcher .label { min-width: 150px; text-align: center; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">🚌 หารถเมล์ [PROTOTYPE]</div>
+    <div class="search-row">
+      <input class="search-input" placeholder="พิมพ์จุดหมาย เช่น สยามพารากอน" value="สยามพารากอน">
+      <button class="pin-btn">📍 ปักหมุด</button>
+    </div>
+    <div class="origin-row">
+      <span id="origin-label">ต้นทาง: ป้ายหน้าคอนโด เอบีซี (GPS)</span>
+      <button>แก้ไข</button>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<div id="switcher">
+  <button id="prev">←</button>
+  <span class="label" id="variant-label"></span>
+  <button id="next">→</button>
+</div>
+
+<script>
+const routes = [
+  { bus: "25", board: "ป้ายหน้าคอนโด ABC", alight: "ป้ายสยามพารากอน", walk: "3 นาที" },
+  { bus: "8", board: "ป้ายปากซอย 4", alight: "ป้ายสยามสแควร์", walk: "7 นาที" },
+  { bus: "48", board: "ป้ายหน้าคอนโด ABC", alight: "ป้ายสยามพารากอน (ฝั่งตรงข้าม)", walk: "4 นาที" },
+];
+
+function variantA() {
+  return `
+    <div class="variant-title">A — List-first (การ์ดเรียงตามลำดับ)</div>
+    ${routes.map(r => `
+      <div class="route-card">
+        <div class="bus-badge">${r.bus}</div>
+        <div class="route-detail">
+          <div class="route-stops">${r.board} → ${r.alight}</div>
+          <div class="route-sub">เดินไปป้าย ${r.walk}</div>
+        </div>
+        <div class="walk-pill">🚶 ${r.walk}</div>
+      </div>
+    `).join("")}
+  `;
+}
+
+function variantB() {
+  return `
+    <div class="variant-title">B — Map-first (แผนที่ + เลื่อนดูสาย)</div>
+    <div class="fake-map">
+      <div class="route-line"></div>
+      <div class="pin origin">🧍</div>
+      <div class="pin dest">🎯</div>
+      <div class="map-caption">แผนที่จำลอง (ของจริงใช้ Longdo Map)</div>
+    </div>
+    <div class="carousel">
+      ${routes.map(r => `
+        <div class="carousel-card">
+          <div class="bus-badge">${r.bus}</div>
+          <div class="route-stops">${r.board}</div>
+          <div class="route-sub">ลงที่ ${r.alight}</div>
+          <div class="route-sub">🚶 เดิน ${r.walk}</div>
+        </div>
+      `).join("")}
+    </div>
+    <div class="dots">${routes.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join("")}</div>
+  `;
+}
+
+let expandedIdx = null;
+function variantC() {
+  return `
+    <div class="variant-title">C — Big-badge focus (เน้นเลขสายใหญ่ๆ)</div>
+    <div class="badge-grid">
+      ${routes.map((r, i) => `
+        <button class="big-badge" onclick="toggleExpand(${i})">
+          ${r.bus}
+          <div class="walk">🚶 ${r.walk}</div>
+        </button>
+      `).join("")}
+      ${expandedIdx !== null ? `
+        <div class="expand-detail">
+          <strong>สาย ${routes[expandedIdx].bus}</strong><br>
+          ขึ้นที่ ${routes[expandedIdx].board}<br>
+          ลงที่ ${routes[expandedIdx].alight}
+        </div>
+      ` : ""}
+    </div>
+    <div class="hint">แตะเลขสายเพื่อดูรายละเอียดป้ายขึ้น/ลง</div>
+  `;
+}
+function toggleExpand(i) {
+  expandedIdx = expandedIdx === i ? null : i;
+  render();
+}
+
+const variants = {
+  A: { render: variantA, name: "List-first" },
+  B: { render: variantB, name: "Map-first" },
+  C: { render: variantC, name: "Big-badge" },
+};
+const order = ["A", "B", "C"];
+
+function getVariant() {
+  const p = new URLSearchParams(location.search).get("variant");
+  return variants[p] ? p : "A";
+}
+function setVariant(key) {
+  const url = new URL(location.href);
+  url.searchParams.set("variant", key);
+  history.replaceState(null, "", url);
+  render();
+}
+function render() {
+  const key = getVariant();
+  document.getElementById("main").innerHTML = variants[key].render();
+  document.getElementById("variant-label").textContent = `${key} (${variants[key].name})`;
+}
+function step(dir) {
+  const key = getVariant();
+  const idx = order.indexOf(key);
+  const next = order[(idx + dir + order.length) % order.length];
+  setVariant(next);
+}
+document.getElementById("prev").onclick = () => step(-1);
+document.getElementById("next").onclick = () => step(1);
+document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA") return;
+  if (e.key === "ArrowLeft") step(-1);
+  if (e.key === "ArrowRight") step(1);
+});
+render();
+</script>
+</body>
+</html>
